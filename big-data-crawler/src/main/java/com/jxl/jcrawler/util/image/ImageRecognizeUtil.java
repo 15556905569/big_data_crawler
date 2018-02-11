@@ -1,12 +1,15 @@
 package com.jxl.jcrawler.util.image;
-
-import com.jxl.jcrawler.enums.ImageRecognizePlatform;
-import com.jxl.jcrawler.enums.VCodeType;
-import com.jxl.jcrawler.util.common.*;
-import com.jxl.jcrawler.util.http.HttpHelper;
-import com.jxl.jcrawler.util.http.SimpleHttpHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.jxl.jcrawler.enums.ImageRecognizePlatform;
+import com.jxl.jcrawler.enums.VCodeType;
+import com.jxl.jcrawler.util.common.Base64Util;
+import com.jxl.jcrawler.util.common.FileUtil;
+import com.jxl.jcrawler.util.common.JsonUtil;
+import com.jxl.jcrawler.util.common.PropertiesUtil;
+import com.jxl.jcrawler.util.common.StringUtil;
+import com.jxl.jcrawler.util.http.HttpHelper;
+import com.jxl.jcrawler.util.http.SimpleHttpHelper;
 
 /**
  * Created by amosli on 20/07/2017.
@@ -21,7 +24,7 @@ public class ImageRecognizeUtil {
     public static String image_recognize_url;
     public static String image_recognize_error_feedback_url;
     private static HttpHelper httpHelper = new SimpleHttpHelper();
-    private static Logger LOGGER = LoggerFactory.getLogger(ImageRecognizeUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImageRecognizeUtil.class);
 
     static {
         load();
@@ -144,6 +147,7 @@ public class ImageRecognizeUtil {
         String param = "base64String=%s&platformType=%d&pCodeType=%d&timeout=%d";
         param = String.format(param, base64String, platformType.ordinal(), type.getCode(), timeout);
         httpHelper.config.addHeader("OrgId", orgId);
+        httpHelper.config.addHeader("Cookie","account=192.168.100.83;accessKey="+orgId);
         String result = httpHelper.goPost(image_recognize_url, param);
         ImageResponse imageResponse = JsonUtil.parse(result, ImageResponse.class);
         if (imageResponse.getSuccess()) {
@@ -167,6 +171,7 @@ public class ImageRecognizeUtil {
 
         int i = 0;
         httpHelper.config.addHeader("OrgId", orgId);
+        httpHelper.config.addHeader("Cookie","account=192.168.100.83;accessKey="+orgId);
         ImageResponse errorImageResponse;
         do {
             i++;
@@ -179,6 +184,25 @@ public class ImageRecognizeUtil {
         } else {
             LOGGER.info("返回题分成功!" + imageResponse);
         }
+    }
+
+    /**
+     * 默认识别失败重试3次
+     *
+     * @param type
+     * @return
+     */
+    public static ImageResponse recognizeWithRetry(VCodeType type,byte[] bytes) {
+        //TODO 需自动切换识别平台 ImageRecognizePlatform[] values = ImageRecognizePlatform.values();
+        for (int i = 0; i < MAX_RETRY; i++) {
+            ImageResponse result = recognize(bytes, type, DEFAULT_PLATFORM, TIMEOUT);
+            if (StringUtil.isEmpty(result)) {
+                continue;
+            }
+            return result;
+        }
+        LOGGER.error("验证码识别次数过多!");
+        return null;
     }
 
 }
