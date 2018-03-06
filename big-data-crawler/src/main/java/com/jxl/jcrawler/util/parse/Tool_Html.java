@@ -76,6 +76,10 @@ public class Tool_Html {
         this.crawl_token = crawl_token;
         this.parameterMap = htmlPages.getPages();
     }
+    
+    public Tool_Html() {
+    	
+    }
 
     // aql 使用说明:
     // aql 如果以 ; 分隔，表示管道，上一个操作的输出(必须为 Element )作为下一个操作的输入
@@ -144,6 +148,25 @@ public class Tool_Html {
         }
         Document doc = Jsoup.parse(defaule_value);
         doc.setBaseUri(page.concat(".1"));
+        return doc;
+    }
+    
+    /**
+     * 直接传入html页面 回去Document
+     *
+     * @param page
+     * @return
+     */
+    public Document get_html(String html) {
+        // TODO 记录日志 返回的页面数据异常
+        String defaule_value = "";
+        if (!StringUtil.isEmpty(html)) {
+            defaule_value = html;
+        } else {
+            //Tool_Collect.collect(website, crawl_token, page.concat(".1"), Level.WARN.name(), "数据源页面为空", null);
+            logger.warn("数据源页面为空");
+        }
+        Document doc = Jsoup.parse(defaule_value);
         return doc;
     }
 
