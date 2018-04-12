@@ -1,9 +1,16 @@
 spring:
     profiles:
        active: uat
-    data:
-       mongodb:
-        host: 192.168.200.130
-        database: hupudata
-        port: 30000
+    application:
+        name: big-data-crawler
+#    data:
+#       mongodb:
+#        host: 192.168.200.130
+#        database: hupudata
+#        port: 30000
+#        
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka/
        

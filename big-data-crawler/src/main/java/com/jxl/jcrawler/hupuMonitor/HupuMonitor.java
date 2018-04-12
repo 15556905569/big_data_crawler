@@ -11,9 +11,9 @@ public class HupuMonitor {
 //		 HupuCrawler.getAllPost("");
 //     }
 	 
-	 @Scheduled(fixedDelay = 1000*60*10)
-     public void updateData() {
-		 HupuDataUpdate.saveAsExcel();
-     }
+//	 @Scheduled(fixedDelay = 1000*60*10)
+//     public void updateData() {
+//		 HupuDataUpdate.saveAsExcel();
+//     }
 
 }
